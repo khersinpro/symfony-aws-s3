@@ -58,10 +58,8 @@ This project is a backend application that allows visitors to upload images to a
     composer install
     ```
 
-8. Create the database and run the migrations:
+8. Migrate the database:
     ```bash
-    php bin/console doctrine:database:create
-    php bin/console make:migration
     php bin/console doctrine:migrations:migrate
     ```
 
