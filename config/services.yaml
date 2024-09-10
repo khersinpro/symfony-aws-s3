@@ -1,0 +1,51 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    Aws\S3\S3Client:
+        class: Aws\S3\S3Client
+        arguments:
+            - 
+                version: 'latest'
+                region: '%env(AWS_DEFAULT_REGION)%'
+                credentials:
+                    key: '%env(AWS_ACCESS_KEY_ID)%'
+                    secret: '%env(AWS_SECRET_ACCESS_KEY)%'
+
+    League\Flysystem\AwsS3V3\AwsS3V3Adapter:
+        arguments:
+            - '@Aws\S3\S3Client'   
+            - '%env(AWS_BUCKET_NAME)%'
+            - ''                     
+
+    filesystem.s3:
+        class: League\Flysystem\Filesystem
+        arguments:
+            - '@League\Flysystem\AwsS3V3\AwsS3V3Adapter'
+
+    League\Flysystem\FilesystemOperator:
+        alias: 'filesystem.s3'
+
+    App\Service\ImageUploaderService:
+        arguments:
+            $s3Storage: '@League\Flysystem\FilesystemOperator'
+            $s3Client: '@Aws\S3\S3Client'
+            $bucketName: '%env(AWS_BUCKET_NAME)%'
+            $defaultRegion: '%env(AWS_DEFAULT_REGION)%'
+

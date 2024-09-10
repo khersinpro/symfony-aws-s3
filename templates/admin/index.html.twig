@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des images{% endblock %}
+
+{% block body %}
+<style>
+.card-img-top {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
+}
+</style>
+
+<div>
+    <div class="row">
+        {% for image in images %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{{ image.url }}" class="card-img-top" alt="Image {{ image.id }}">
+                    <div class="card-body">
+                        <h5 class="card-title">Image #{{ image.id }}</h5>
+                        <p class="card-text">Date d'upload : {{ image.uploadedAt|date('d/m/Y') }}</p>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-md-12">
+                <p>Aucune image uploadée pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+        <div class="d-flex justify-content-center">
+        {{ knp_pagination_render(images) }}
+    </div>
+</div>
+{% endblock %}
